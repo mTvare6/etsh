@@ -62,19 +62,16 @@ fn main() -> Result<(), Box<dyn Error>> {
                         .stdin(stdin)
                         .stdout(stdout)
                         .spawn();
-                    match child {
-                        Ok(child) => previous_child = Some(child),
-                        Err(e) => {
-                            eprintln!("{}", e);
-                            previous_child = None
-                        }
-                    };
+                    if let Err(ref e) = child {
+                        eprintln!("{}", e);
+                    }
+                    previous_child = child.ok()
                 }
             }
         }
 
         if let Some(mut tail) = previous_child {
-            tail.wait();
+            let _ = tail.wait();
         }
     }
 }
